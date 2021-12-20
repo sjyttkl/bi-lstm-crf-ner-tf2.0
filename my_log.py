@@ -1,8 +1,14 @@
-#!/usr/bin/env python
-#-*- coding:utf-8 -*-
-#@Time  : 17/1/2 下午3:15
-#@Author: wuchenglong
+# -*- coding: utf-8 -*-
 
+"""
+==================================================
+   File Name：     my_log.py
+   email:         songdongdong@weidian.com
+   Author :       songdongdong
+   date：          2021/12/20 09:39
+   Description : my_log.py
+==================================================
+"""
 ####################
 # log config
 ####################

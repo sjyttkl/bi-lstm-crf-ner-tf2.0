@@ -1,13 +1,26 @@
-# !/usr/bin/env python
-# -*- coding:utf-8 -*-
-# @Time  : 2019/12/3 7:30 下午
-# @Author: wuchenglong
+# -*- coding: utf-8 -*-
 
+"""
+==================================================
+   File Name：     utils.py
+   email:         songdongdong@weidian.com
+   Author :       songdongdong
+   date：          2021/12/20 09:45
+   Description : utils.py
+==================================================
+"""
 
 import tensorflow as tf
 import json,os
 
 def build_vocab(corpus_file_list, vocab_file, tag_file):
+    """
+    构建 vocab 词典
+    :param corpus_file_list: 训练文本
+    :param vocab_file: 词典文件
+    :param tag_file: tag文件
+    :return:
+    """
     words = set()
     tags = set()
     for file in corpus_file_list:
@@ -26,7 +39,7 @@ def build_vocab(corpus_file_list, vocab_file, tag_file):
                 # raise e
 
     if not os.path.exists(vocab_file):
-        with open(vocab_file,"w") as f:
+        with open(vocab_file,"w",encoding="Utf-8") as f:
             for index,word in enumerate(["<UKN>"]+list(words) ):
                 f.write(word+"\n")
 
@@ -37,7 +50,7 @@ def build_vocab(corpus_file_list, vocab_file, tag_file):
         "E": 3,
     }
 
-    tags = sorted(list(tags),
+    tags = sorted(list(tags), #B-LOC
            key=lambda x: (len(x.split("-")), x.split("-")[-1], tag_sort.get(x.split("-")[0], 100))
            )
     if not os.path.exists(tag_file):
@@ -49,9 +62,14 @@ def build_vocab(corpus_file_list, vocab_file, tag_file):
 
 
 def read_vocab(vocab_file):
+    """
+    read vocab文件
+    :param vocab_file: input 文件
+    :return: 返回 vocab2id, id2vocab
+    """
     vocab2id = {}
     id2vocab = {}
-    for index,line in enumerate([line.strip() for line in open(vocab_file,"r").readlines()]):
+    for index,line in enumerate([line.strip() for line in open(vocab_file,"r",encoding="utf-8").readlines()]):
         vocab2id[line] = index
         id2vocab[index] = line
     return vocab2id, id2vocab
@@ -61,6 +79,13 @@ def read_vocab(vocab_file):
 
 
 def tokenize(filename,vocab2id,tag2id):
+    """
+     use list format to load train data
+    :param filename: train data
+    :param vocab2id:  vocabid
+    :param tag2id: tagid
+    :return:
+    """
     contents = []
     labels = []
     content = []
@@ -70,18 +95,18 @@ def tokenize(filename,vocab2id,tag2id):
             try:
                 if line != "end":
                     w,t = line.split()
-                    content.append(vocab2id.get(w,0))
+                    content.append(vocab2id.get(w,0)) # default id is 0
                     label.append(tag2id.get(t,0))
                 else:
                     if content and label:
-                        contents.append(content)
-                        labels.append(label)
+                        contents.append(content) # use list format
+                        labels.append(label) # use list format
                     content = []
                     label = []
             except Exception as e:
                 content = []
                 label = []
-
+    # use max sentence length padding post
     contents = tf.keras.preprocessing.sequence.pad_sequences(contents, padding='post')
     labels = tf.keras.preprocessing.sequence.pad_sequences(labels, padding='post')
     return contents,labels

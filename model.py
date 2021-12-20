@@ -1,8 +1,14 @@
-# !/usr/bin/env python
-# -*- coding:utf-8 -*-
-# @Time  : 2019/12/3 7:15 下午
-# @Author: wuchenglong
+# -*- coding: utf-8 -*-
 
+"""
+==================================================
+   File Name：     1.py
+   email:         songdongdong@weidian.com
+   Author :       songdongdong
+   date：          2021/12/20 09:39
+   Description : model.py
+==================================================
+"""
 
 import tensorflow as tf
 import tensorflow_addons as tf_ad
@@ -23,6 +29,7 @@ class NerModel(tf.keras.Model):
         self.dropout = tf.keras.layers.Dropout(0.5)
 
     # @tf.function
+    # @tf.function(input_signature=[tf.TensorSpec(shape=[None,2],dtype=tf.float32)])
     def call(self, text,labels=None,training=None):
         text_lens = tf.math.reduce_sum(tf.cast(tf.math.not_equal(text, 0), dtype=tf.int32), axis=-1)
         # -1 change 0
@@ -31,6 +38,7 @@ class NerModel(tf.keras.Model):
         logits = self.dense(self.biLSTM(inputs))
 
         if labels is not None:
+            # train
             label_sequences = tf.convert_to_tensor(labels, dtype=tf.int32)
             log_likelihood, self.transition_params = tf_ad.text.crf_log_likelihood(logits,
                                                                                    label_sequences,
